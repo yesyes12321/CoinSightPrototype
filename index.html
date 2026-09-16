@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CoinSight — Thai coin recognition</title>
+<style>
+  :root{
+    --bg: #ffffff;
+    --bg-soft: #f4f5f6;
+    --text: #1c1f24;
+    --text-muted: #63696f;
+    --border: #dfe2e6;
+    --blue: #1f5ce0;
+    --blue-dark: #1848b8;
+    --blue-soft: #eaf0fd;
+    --radius: 8px;
+    --max-width: 960px;
+    font-size: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  img { max-width: 100%; display: block; }
+
+  .wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Navbar */
+  header.site-header {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .logo-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--blue);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--blue);
+    flex-shrink: 0;
+  }
+
+  nav.primary-nav {
+    display: flex;
+    gap: 28px;
+  }
+
+  nav.primary-nav a {
+    text-decoration: none;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  nav.primary-nav a:hover {
+    color: var(--text);
+  }
+
+  /* Hero */
+  .hero {
+    padding: 64px 0 8px;
+  }
+
+  .hero-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--blue);
+    letter-spacing: 0.03em;
+    margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    line-height: 1.15;
+    margin: 0 0 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    max-width: 14ch;
+  }
+
+  .hero p.lead {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 52ch;
+    margin: 0 0 40px;
+  }
+
+  /* Upload card */
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+
+  .model-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #c7cbd1;
+    flex-shrink: 0;
+  }
+
+  .status-dot.ready { background: #2a9d5c; }
+  .status-dot.error { background: #c0392b; }
+
+  .dropzone {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .dropzone:hover,
+  .dropzone.drag-active {
+    border-color: var(--blue);
+    background: var(--blue-soft);
+  }
+
+  .dropzone-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 16px;
+    color: var(--text-muted);
+  }
+
+  .dropzone-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .dropzone-sub {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: var(--blue-dark);
+  }
+
+  .btn-primary:disabled {
+    background: #a9bce9;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-soft);
+  }
+
+  .btn-text {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    padding: 6px 4px;
+    text-decoration: underline;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .btn-text:hover {
+    color: var(--text);
+  }
+
+  /* Preview state */
+  .preview-area {
+    display: none;
+  }
+
+  .preview-area.active {
+    display: block;
+  }
+
+  .preview-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .preview-image-box {
+    width: 180px;
+    height: 180px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-soft);
+  }
+
+  .preview-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-info {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .preview-filename {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    word-break: break-all;
+  }
+
+  .preview-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .dropzone.active {
+    display: none;
+  }
+
+  /* Results */
+  .results-area {
+    display: none;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .results-area.active {
+    display: block;
+  }
+
+  .results-row {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .results-image-box {
+    width: 140px;
+    height: 140px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-soft);
+  }
+
+  .results-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .results-body {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .results-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+  }
+
+  .results-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+  }
+
+  .confidence-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .confidence-bar {
+    width: 120px;
+    height: 6px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .confidence-bar-fill {
+    height: 100%;
+    background: var(--blue);
+  }
+
+  .breakdown {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .breakdown-label {
+    width: 48px;
+    flex-shrink: 0;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .breakdown-bar {
+    flex: 1;
+    height: 5px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .breakdown-bar-fill {
+    height: 100%;
+    background: #c3d3f7;
+  }
+
+  .breakdown-pct {
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .error-note {
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: #a4302a;
+    padding: 10px 12px;
+    background: #fbeceb;
+    border: 1px solid #f0c6c3;
+    border-radius: 6px;
+    display: none;
+  }
+
+  .error-note.active {
+    display: block;
+  }
+
+  .loading-row {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 20px;
+  }
+
+  .loading-row.active {
+    display: flex;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Section generic */
+  section {
+    padding: 64px 0;
+  }
+
+  section.alt {
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-heading {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .section-sub {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 0 0 36px;
+    max-width: 52ch;
+  }
+
+  /* Supported coins */
+  .coin-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+
+  .coin-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    padding: 22px 8px;
+    text-align: center;
+  }
+
+  .coin-face {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .coin-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  /* How it works */
+  .steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 560px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 18px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .step-item:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-number {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  .step-title {
+    font-weight: 600;
+    margin: 0 0 4px;
+    font-size: 0.98rem;
+  }
+
+  .step-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* Footer */
+  footer.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .footer-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .hero h1 {
+      font-size: 1.9rem;
+      max-width: none;
+    }
+
+    nav.primary-nav {
+      gap: 16px;
+    }
+
+    .coin-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .results-row,
+    .preview-row {
+      flex-direction: column;
+    }
+
+    section {
+      padding: 48px 0;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .coin-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .logo span.logo-text {
+      font-size: 0.98rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spinner {
+      animation: none;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap nav-row">
+    <a href="#" class="logo">
+      <span class="logo-mark">C</span>
+      <span class="logo-text">CoinSight</span>
+    </a>
+    <nav class="primary-nav">
+      <a href="#how-it-works">How it works</a>
+      <a href="#supported-coins">Supported coins</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-label">Thai coin recognition</div>
+      <h1>See it. Recognize it.</h1>
+      <p class="lead">
+        CoinSight uses computer vision to identify Thai coins from a photo. Upload an
+        image of a single coin and CoinSight will predict its denomination.
+      </p>
+
+      <div class="card">
+        <div class="model-status" id="modelStatus">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Loading model…</span>
+        </div>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a coin image">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 16V4M12 4L7 9M12 4l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="dropzone-title">Drop a coin image here</p>
+          <p class="dropzone-sub">or choose an image from your device</p>
+          <button type="button" class="btn btn-secondary" id="chooseBtn">Choose image</button>
+          <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="preview-area" id="previewArea">
+          <div class="preview-row">
+            <div class="preview-image-box">
+              <img id="previewImg" src="" alt="Uploaded coin preview">
+            </div>
+            <div class="preview-info">
+              <div class="preview-filename" id="previewFilename"></div>
+              <div class="preview-actions">
+                <button type="button" class="btn btn-primary" id="recognizeBtn">Recognize coin</button>
+                <button type="button" class="btn-text" id="removeBtn">Remove image</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="loading-row" id="loadingRow">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Analyzing image…</span>
+          </div>
+
+          <div class="error-note" id="errorNote"></div>
+
+          <div class="results-area" id="resultsArea">
+            <div class="results-row">
+              <div class="results-image-box">
+                <img id="resultImg" src="" alt="Analyzed coin">
+              </div>
+              <div class="results-body">
+                <p class="results-label">Prediction</p>
+                <p class="results-value" id="resultValue">฿10</p>
+                <div class="confidence-row">
+                  <span id="confidenceText">92% confidence</span>
+                  <div class="confidence-bar">
+                    <div class="confidence-bar-fill" id="confidenceBarFill" style="width: 92%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="breakdown" id="breakdown"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="supported-coins" class="alt">
+    <div class="wrap">
+      <h2 class="section-heading">Supported coins</h2>
+      <p class="section-sub">CoinSight currently recognizes five Thai coin denominations.</p>
+      <div class="coin-grid">
+        <div class="coin-item">
+          <div class="coin-face">฿0.25</div>
+          <div class="coin-value">฿0.25</div>
+        </div>
+        <div class="coin-item">
+          <div class="coin-face">฿1</div>
+          <div class="coin-value">฿1</div>
+        </div>
+        <div class="coin-item">
+          <div class="coin-face">฿2</div>
+          <div class="coin-value">฿2</div>
+        </div>
+        <div class="coin-item">
+          <div class="coin-face">฿5</div>
+          <div class="coin-value">฿5</div>
+        </div>
+        <div class="coin-item">
+          <div class="coin-face">฿10</div>
+          <div class="coin-value">฿10</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="wrap">
+      <h2 class="section-heading">How it works</h2>
+      <p class="section-sub">Three steps from photo to prediction.</p>
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div>
+            <p class="step-title">Upload a photo</p>
+            <p class="step-desc">Choose or drop a clear image of a single Thai coin.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div>
+            <p class="step-title">CoinSight analyzes the image</p>
+            <p class="step-desc">The model examines the coin's shape, size, and markings.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div>
+            <p class="step-title">Get a prediction</p>
+            <p class="step-desc">CoinSight returns the predicted denomination and its confidence.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <span class="footer-name">CoinSight</span>
+    <span class="footer-tagline">AI-powered Thai coin recognition.</span>
+  </div>
+</footer>
+
+<!-- Teachable Machine dependencies (image model) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  /* -----------------------------------------------------------
+     Prediction module
+     Kept separate from UI code. This is wired to a real
+     Teachable Machine model. To point it at a different model,
+     change only MODEL_URL below.
+  ----------------------------------------------------------- */
+  const CoinModel = (function () {
+    // Teachable Machine model base URL (must end with a trailing slash).
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/lzjfvjl-J/";
+
+    let model = null;
+    let modelReady = false;
+    let loadError = null;
+
+    async function loadModel() {
+      try {
+        const modelJsonURL = MODEL_URL + "model.json";
+        const metadataURL = MODEL_URL + "metadata.json";
+        model = await tmImage.load(modelJsonURL, metadataURL);
+        modelReady = true;
+        loadError = null;
+      } catch (err) {
+        modelReady = false;
+        loadError = err;
+        console.error("CoinSight: failed to load Teachable Machine model.", err);
+      }
+      return modelReady;
+    }
+
+    // imageElement: an HTMLImageElement already loaded (naturalWidth/Height set)
+    // Returns: { label, confidence, breakdown: [{label, confidence}, ...] }
+    async function predict(imageElement) {
+      if (!modelReady || !model) {
+        throw new Error("Model is not loaded yet.");
+      }
+
+      const predictions = await model.predict(imageElement);
+      // predictions: [{ className, probability }, ...]
+
+      const sorted = predictions.slice().sort((a, b) => b.probability - a.probability);
+      const top = sorted[0];
+
+      return {
+        label: top.className,
+        confidence: Math.round(top.probability * 100),
+        breakdown: sorted.map((p) => ({
+          label: p.className,
+          confidence: Math.round(p.probability * 100)
+        }))
+      };
+    }
+
+    return {
+      loadModel,
+      predict,
+      isReady: () => modelReady,
+      getError: () => loadError
+    };
+  })();
+
+  /* -----------------------------------------------------------
+     UI logic
+  ----------------------------------------------------------- */
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("fileInput");
+  const chooseBtn = document.getElementById("chooseBtn");
+  const previewArea = document.getElementById("previewArea");
+  const previewImg = document.getElementById("previewImg");
+  const previewFilename = document.getElementById("previewFilename");
+  const removeBtn = document.getElementById("removeBtn");
+  const recognizeBtn = document.getElementById("recognizeBtn");
+  const loadingRow = document.getElementById("loadingRow");
+  const errorNote = document.getElementById("errorNote");
+  const resultsArea = document.getElementById("resultsArea");
+  const resultImg = document.getElementById("resultImg");
+  const resultValue = document.getElementById("resultValue");
+  const confidenceText = document.getElementById("confidenceText");
+  const confidenceBarFill = document.getElementById("confidenceBarFill");
+  const breakdownEl = document.getElementById("breakdown");
+
+  let currentObjectUrl = null;
+
+  function setStatus(state, text) {
+    statusDot.classList.remove("ready", "error");
+    if (state === "ready") statusDot.classList.add("ready");
+    if (state === "error") statusDot.classList.add("error");
+    statusText.textContent = text;
+  }
+
+  function showError(message) {
+    errorNote.textContent = message;
+    errorNote.classList.add("active");
+  }
+
+  function clearError() {
+    errorNote.textContent = "";
+    errorNote.classList.remove("active");
+  }
+
+  function resetToUploadState() {
+    dropzone.classList.remove("active");
+    previewArea.classList.remove("active");
+    resultsArea.classList.remove("active");
+    loadingRow.classList.remove("active");
+    clearError();
+    recognizeBtn.disabled = !CoinModel.isReady();
+    recognizeBtn.textContent = "Recognize coin";
+
+    if (currentObjectUrl) {
+      URL.revokeObjectURL(currentObjectUrl);
+      currentObjectUrl = null;
+    }
+    fileInput.value = "";
+  }
+
+  function showPreview(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(file);
+
+    previewImg.src = currentObjectUrl;
+    previewFilename.textContent = file.name;
+
+    dropzone.classList.add("active");
+    previewArea.classList.add("active");
+    resultsArea.classList.remove("active");
+    clearError();
+  }
+
+  function renderBreakdown(breakdown) {
+    breakdownEl.innerHTML = "";
+    breakdown.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "breakdown-row";
+
+      const label = document.createElement("span");
+      label.className = "breakdown-label";
+      label.textContent = item.label;
+
+      const bar = document.createElement("div");
+      bar.className = "breakdown-bar";
+      const fill = document.createElement("div");
+      fill.className = "breakdown-bar-fill";
+      fill.style.width = item.confidence + "%";
+      bar.appendChild(fill);
+
+      const pct = document.createElement("span");
+      pct.className = "breakdown-pct";
+      pct.textContent = item.confidence + "%";
+
+      row.appendChild(label);
+      row.appendChild(bar);
+      row.appendChild(pct);
+      breakdownEl.appendChild(row);
+    });
+  }
+
+  async function runRecognition() {
+    if (!CoinModel.isReady()) {
+      showError("The model is not loaded yet. Please wait a moment and try again.");
+      return;
+    }
+
+    resultsArea.classList.remove("active");
+    loadingRow.classList.add("active");
+    clearError();
+    recognizeBtn.disabled = true;
+    recognizeBtn.textContent = "Analyzing…";
+
+    try {
+      const result = await CoinModel.predict(previewImg);
+
+      resultImg.src = previewImg.src;
+      resultValue.textContent = result.label;
+      confidenceText.textContent = result.confidence + "% confidence";
+      confidenceBarFill.style.width = result.confidence + "%";
+      renderBreakdown(result.breakdown);
+
+      resultsArea.classList.add("active");
+    } catch (err) {
+      console.error("CoinSight: prediction failed.", err);
+      showError("Something went wrong while analyzing this image. Please try again.");
+    } finally {
+      loadingRow.classList.remove("active");
+      recognizeBtn.disabled = false;
+      recognizeBtn.textContent = "Recognize coin";
+    }
+  }
+
+  chooseBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    fileInput.click();
+  });
+
+  dropzone.addEventListener("click", () => fileInput.click());
+
+  dropzone.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) showPreview(file);
+  });
+
+  ["dragenter", "dragover"].forEach((evt) => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzone.classList.add("drag-active");
+    });
+  });
+
+  ["dragleave", "drop"].forEach((evt) => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("drag-active");
+    });
+  });
+
+  dropzone.addEventListener("drop", (e) => {
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) showPreview(file);
+  });
+
+  removeBtn.addEventListener("click", resetToUploadState);
+  recognizeBtn.addEventListener("click", runRecognition);
+
+  // Recognize button stays disabled until the model has loaded.
+  recognizeBtn.disabled = true;
+
+  setStatus("loading", "Loading model…");
+  CoinModel.loadModel().then((ok) => {
+    if (ok) {
+      setStatus("ready", "Model loaded and ready");
+      if (previewArea.classList.contains("active")) {
+        recognizeBtn.disabled = false;
+      }
+    } else {
+      setStatus("error", "Model failed to load — check your connection and refresh");
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
