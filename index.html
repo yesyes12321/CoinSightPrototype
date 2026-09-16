@@ -208,13 +208,6 @@
     display: none;
   }
 
-  .dropzone-actions {
-    display: inline-flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
   /* Buttons */
   .btn {
     display: inline-flex;
@@ -717,12 +710,8 @@
           </svg>
           <p class="dropzone-title">Drop a coin image here</p>
           <p class="dropzone-sub">or choose an image from your device</p>
-          <div class="dropzone-actions">
-            <button type="button" class="btn btn-secondary" id="chooseBtn">Choose image</button>
-            <button type="button" class="btn btn-secondary" id="cameraBtn">Take photo</button>
-          </div>
+          <button type="button" class="btn btn-secondary" id="chooseBtn">Choose image</button>
           <input type="file" id="fileInput" accept="image/*">
-          <input type="file" id="cameraInput" accept="image/*" capture="environment">
         </div>
 
         <div class="preview-area" id="previewArea">
@@ -915,9 +904,7 @@
   const statusText = document.getElementById("statusText");
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("fileInput");
-  const cameraInput = document.getElementById("cameraInput");
   const chooseBtn = document.getElementById("chooseBtn");
-  const cameraBtn = document.getElementById("cameraBtn");
   const previewArea = document.getElementById("previewArea");
   const previewImg = document.getElementById("previewImg");
   const previewFilename = document.getElementById("previewFilename");
@@ -966,7 +953,6 @@
       currentObjectUrl = null;
     }
     fileInput.value = "";
-    cameraInput.value = "";
   }
 
   function showPreview(file) {
@@ -1055,11 +1041,6 @@
     fileInput.click();
   });
 
-  cameraBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    cameraInput.click();
-  });
-
   dropzone.addEventListener("click", () => fileInput.click());
 
   dropzone.addEventListener("keydown", (e) => {
@@ -1070,11 +1051,6 @@
   });
 
   fileInput.addEventListener("change", (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) showPreview(file);
-  });
-
-  cameraInput.addEventListener("change", (e) => {
     const file = e.target.files && e.target.files[0];
     if (file) showPreview(file);
   });
