@@ -159,6 +159,17 @@
   .status-dot.ready { background: #2a9d5c; }
   .status-dot.error { background: #c0392b; }
 
+  .model-version {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 8px;
+    flex-shrink: 0;
+  }
+
   .dropzone {
     border: 1.5px dashed var(--border);
     border-radius: var(--radius);
@@ -195,6 +206,13 @@
 
   input[type="file"] {
     display: none;
+  }
+
+  .dropzone-actions {
+    display: inline-flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   /* Buttons */
@@ -444,6 +462,21 @@
     display: block;
   }
 
+  .low-confidence-note {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #8a6816;
+    padding: 10px 12px;
+    background: #fdf3df;
+    border: 1px solid #eedcae;
+    border-radius: 6px;
+    display: none;
+  }
+
+  .low-confidence-note.active {
+    display: block;
+  }
+
   .loading-row {
     display: none;
     align-items: center;
@@ -674,6 +707,7 @@
         <div class="model-status" id="modelStatus">
           <span class="status-dot" id="statusDot"></span>
           <span id="statusText">Loading model…</span>
+          <span class="model-version" id="modelVersion">Model v0.1 — trained on ฿5 and ฿10</span>
         </div>
 
         <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a coin image">
@@ -683,8 +717,12 @@
           </svg>
           <p class="dropzone-title">Drop a coin image here</p>
           <p class="dropzone-sub">or choose an image from your device</p>
-          <button type="button" class="btn btn-secondary" id="chooseBtn">Choose image</button>
+          <div class="dropzone-actions">
+            <button type="button" class="btn btn-secondary" id="chooseBtn">Choose image</button>
+            <button type="button" class="btn btn-secondary" id="cameraBtn">Take photo</button>
+          </div>
           <input type="file" id="fileInput" accept="image/*">
+          <input type="file" id="cameraInput" accept="image/*" capture="environment">
         </div>
 
         <div class="preview-area" id="previewArea">
@@ -724,6 +762,7 @@
                 </div>
               </div>
             </div>
+            <div class="low-confidence-note" id="lowConfidenceNote">Low confidence — try a clearer photo.</div>
             <div class="breakdown" id="breakdown"></div>
           </div>
         </div>
@@ -869,11 +908,16 @@
   /* -----------------------------------------------------------
      UI logic
   ----------------------------------------------------------- */
+  // Prediction is considered unreliable below this confidence level.
+  const LOW_CONFIDENCE_THRESHOLD = 60;
+
   const statusDot = document.getElementById("statusDot");
   const statusText = document.getElementById("statusText");
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("fileInput");
+  const cameraInput = document.getElementById("cameraInput");
   const chooseBtn = document.getElementById("chooseBtn");
+  const cameraBtn = document.getElementById("cameraBtn");
   const previewArea = document.getElementById("previewArea");
   const previewImg = document.getElementById("previewImg");
   const previewFilename = document.getElementById("previewFilename");
@@ -887,6 +931,7 @@
   const confidenceText = document.getElementById("confidenceText");
   const confidenceBarFill = document.getElementById("confidenceBarFill");
   const breakdownEl = document.getElementById("breakdown");
+  const lowConfidenceNote = document.getElementById("lowConfidenceNote");
 
   let currentObjectUrl = null;
 
@@ -921,6 +966,7 @@
       currentObjectUrl = null;
     }
     fileInput.value = "";
+    cameraInput.value = "";
   }
 
   function showPreview(file) {
@@ -987,6 +1033,12 @@
       confidenceBarFill.style.width = result.confidence + "%";
       renderBreakdown(result.breakdown);
 
+      if (result.confidence < LOW_CONFIDENCE_THRESHOLD) {
+        lowConfidenceNote.classList.add("active");
+      } else {
+        lowConfidenceNote.classList.remove("active");
+      }
+
       resultsArea.classList.add("active");
     } catch (err) {
       console.error("CoinSight: prediction failed.", err);
@@ -1003,6 +1055,11 @@
     fileInput.click();
   });
 
+  cameraBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    cameraInput.click();
+  });
+
   dropzone.addEventListener("click", () => fileInput.click());
 
   dropzone.addEventListener("keydown", (e) => {
@@ -1013,6 +1070,11 @@
   });
 
   fileInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) showPreview(file);
+  });
+
+  cameraInput.addEventListener("change", (e) => {
     const file = e.target.files && e.target.files[0];
     if (file) showPreview(file);
   });
