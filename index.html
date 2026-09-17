@@ -842,7 +842,7 @@
   ----------------------------------------------------------- */
   const CoinModel = (function () {
     // Teachable Machine model base URL (must end with a trailing slash).
-    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/lzjfvjl-J/";
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/vbDeDP72Tp/";
 
     let model = null;
     let modelReady = false;
@@ -898,7 +898,7 @@
      UI logic
   ----------------------------------------------------------- */
   // Prediction is considered unreliable below this confidence level.
-  const LOW_CONFIDENCE_THRESHOLD = 60;
+  const LOW_CONFIDENCE_THRESHOLD = 65;
 
   const statusDot = document.getElementById("statusDot");
   const statusText = document.getElementById("statusText");
